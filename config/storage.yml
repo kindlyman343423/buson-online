@@ -1,0 +1,54 @@
+test:
+  service: Disk
+  root: <%= Rails.root.join("tmp/storage") %>
+
+local:
+  service: Disk
+  root: <%= Rails.root.join("storage") %>
+
+minio:
+  service: S3
+  access_key_id: minio
+  secret_access_key: password
+  region: ap-northeast-1
+  endpoint: http://minio:9000
+  bucket: dev
+  force_path_style: true
+
+# Use bin/rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
+# amazon:
+#   service: S3
+#   access_key_id: <%= Rails.application.credentials.dig(:aws, :access_key_id) %>
+#   secret_access_key: <%= Rails.application.credentials.dig(:aws, :secret_access_key) %>
+#   region: us-east-1
+#   bucket: your_own_bucket-<%= Rails.env %>
+
+# Remember not to checkin your GCS keyfile to a repository
+google:
+  service: GCS
+  project: <%= ENV["GOOGLE_PROJECT_ID"] %>
+  bucket: <%= ENV["STORAGE_BUCKET_NAME"] %>
+  # credentials: <%= Rails.root.join("buson-online-salon-389404-07549497c433.json") %>
+  credentials:
+    type: "service_account"
+    project_id: <%= ENV["STORAGE_PROJECT_ID"] %>
+    private_key_id: <%= ENV["STORAGE_PRIVATE_KEY_ID"] %>
+    private_key: <%= ENV["STORAGE_PRIVATE_KEY"] %>
+    client_email: <%= ENV["STORAGE_CLIENT_EMAIL"] %>
+    client_id: <%= ENV["STORAGE_CLIENT_ID"] %>
+    auth_uri: "https://accounts.google.com/o/oauth2/auth"
+    token_uri: "https://oauth2.googleapis.com/token"
+    auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs"
+    client_x509_cert_url: <%= ENV["STORAGE_CLIENT_X509_CERT_URL"] %>
+    universe_domain: "googleapis.com"
+# Use bin/rails credentials:edit to set the Azure Storage secret (as azure_storage:storage_access_key)
+# microsoft:
+#   service: AzureStorage
+#   storage_account_name: your_account_name
+#   storage_access_key: <%= Rails.application.credentials.dig(:azure_storage, :storage_access_key) %>
+#   container: your_container_name-<%= Rails.env %>
+
+# mirror:
+#   service: Mirror
+#   primary: local
+#   mirrors: [ amazon, google, microsoft ]
