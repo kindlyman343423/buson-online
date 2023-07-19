@@ -1,0 +1,35 @@
+FROM ruby:3.2.2
+
+# warningの削除のため：debconf: delaying package configuration, since apt-utils is not installed
+ENV DEBCONF_NOWARNINGS=yes
+
+RUN apt-get update -qq && \
+    apt-get install -y build-essential \ 
+                       libpq-dev \        
+                       nodejs \
+                       postgresql-client \
+                       cron \
+                       vim \
+                       imagemagick \
+   && rm -rf /var/lib/apt/lists/* 
+
+RUN mkdir /api
+ENV APP_ROOT /api
+WORKDIR $APP_ROOT
+
+ADD ./Gemfile $APP_ROOT/Gemfile
+ADD ./Gemfile.lock $APP_ROOT/Gemfile.lock
+
+RUN bundle install
+
+COPY . $APP_ROOT
+
+# Add a script to be executed every time the container starts.
+COPY entrypoint.sh /usr/bin/
+RUN chmod +x /usr/bin/entrypoint.sh
+ENTRYPOINT ["entrypoint.sh"]
+EXPOSE 8080
+
+# Start the main process.
+# CMD bundle exec foreman start
+CMD ["rails", "server", "-b", "0.0.0.0", "-p", "8080"]
